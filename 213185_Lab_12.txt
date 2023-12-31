@@ -1,0 +1,305 @@
+
+
+     Lab  12
+
+Example : 01
+
+
+UserControl1.xaml:
+<UserControl x:Class="Lab_12.UserControl1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lab_12"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid x:Name="date">
+        <TextBox HorizontalAlignment="Left" Margin="329,127,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+    </Grid>
+</UserControl>
+
+UserControl1.xaml.cs:
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace Lab_12
+{
+    /// <summary>
+    /// Interaction logic for UserControl1.xaml
+    /// </summary>
+    public partial class UserControl1 : UserControl
+    {
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+        // Dependency Property
+        public static readonly DependencyProperty CurrentTimeProperty =
+        DependencyProperty.Register("CurrentTime", typeof(DateTime),
+        typeof(DatePicker), new FrameworkPropertyMetadata(DateTime.Now));
+        // .NET Property wrapper
+        public DateTime CurrentTime
+        {
+            get { return (DateTime)GetValue(CurrentTimeProperty); }
+            set { SetValue(CurrentTimeProperty, value); }
+        }
+    }
+}
+
+Exercise : 01
+
+MainWindow.xaml:
+<Window x:Class="Lab_12.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Address Selection" Height="350" Width="500">
+    <Grid>
+        <ComboBox x:Name="addressComboBox" Width="300" Height="30" Margin="50" SelectedIndex="0" SelectionChanged="AddressComboBox_SelectionChanged">
+            <ComboBoxItem Content="123 Main St, CityA, CountryX" />
+            <ComboBoxItem Content="456 Elm St, CityB, CountryY" />
+            <!-- Add other addresses to the ComboBox as needed -->
+        </ComboBox>
+        <TextBlock Text="Selected Address:" VerticalAlignment="Center" Margin="50,100,0,0" />
+        <TextBlock x:Name="selectedAddressTextBlock" VerticalAlignment="Center" Margin="180,100,0,0" Text="{Binding SelectedAddress, ElementName=mainWindow}" />
+    </Grid>
+</Window>
+
+
+MainWindow.xaml.cs: 
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml.Linq;
+
+namespace Lab_12
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+        public static readonly DependencyProperty SelectedAddressProperty =
+            DependencyProperty.Register("SelectedAddress", typeof(string), typeof(MainWindow), new PropertyMetadata(""));
+
+        public string SelectedAddress
+        {
+            get { return (string)GetValue(SelectedAddressProperty); }
+            set { SetValue(SelectedAddressProperty, value); }
+        }
+
+        private void AddressComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            if (comboBox.SelectedItem != null)
+            {
+                SelectedAddress = ((ComboBoxItem)comboBox.SelectedItem).Content.ToString();
+            }
+        }
+    }
+
+}
+
+Exercises : 02
+
+MainWindow.xaml:
+<Window x:Class="Lab_12.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Address Selection" Height="350" Width="500">
+    <Grid>
+        <ComboBox x:Name="addressComboBox" Width="300" Height="30" Margin="50" SelectedIndex="0" SelectionChanged="AddressComboBox_SelectionChanged">
+            <ComboBoxItem Content="123 Main St, CityA, CountryX" />
+            <ComboBoxItem Content="456 Elm St, CityB, CountryY" />
+            <!-- Add other addresses to the ComboBox as needed -->
+        </ComboBox>
+        <TextBlock Text="Selected Address:" VerticalAlignment="Center" Margin="50,100,0,0" />
+        <TextBlock x:Name="selectedAddressTextBlock" VerticalAlignment="Center" Margin="180,100,0,0" Text="{Binding SelectedAddress, ElementName=mainWindow}" />
+    </Grid>
+</Window>
+
+MainWindow.xaml.cs:
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Xml.Linq;
+
+namespace Lab_12
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>\
+    class Address
+    {
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Street}, {City}, {State} {ZipCode}";
+        }
+    }
+    class Program
+    {
+        static List<Address> addresses = new List<Address>();
+
+        static void MainWindow(string[] args)
+        {
+            // Assuming you have some addresses already stored
+            addresses.Add(new Address { Street = "123 Main St", City = "Exampleville", State = "CA", ZipCode = "12345" });
+            addresses.Add(new Address { Street = "456 Elm St", City = "Sampletown", State = "NY", ZipCode = "67890" });
+
+            // Present the current addresses
+            Console.WriteLine("Current addresses:");
+            DisplayAddresses();
+
+            Console.WriteLine("Do you want to change an existing address or add a new one?");
+            Console.WriteLine("Enter 'change' or 'add':");
+            string choice = Console.ReadLine();
+
+            if (choice.ToLower() == "change")
+            {
+                Console.WriteLine("Enter the index of the address you want to change:");
+                if (int.TryParse(Console.ReadLine(), out int index) && index >= 0 && index < addresses.Count)
+                {
+                    ChangeAddress(index);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid index. Please enter a valid index.");
+                }
+            }
+            else if (choice.ToLower() == "add")
+            {
+                AddNewAddress();
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+            }
+
+            Console.WriteLine("Updated addresses:");
+            DisplayAddresses();
+        }
+
+        static void ChangeAddress(int index)
+        {
+            Address selectedAddress = addresses[index];
+
+            Console.WriteLine($"Current address: {selectedAddress}");
+
+            Console.WriteLine("Enter new street:");
+            selectedAddress.Street = Console.ReadLine();
+
+            Console.WriteLine("Enter new city:");
+            selectedAddress.City = Console.ReadLine();
+
+            Console.WriteLine("Enter new state:");
+            selectedAddress.State = Console.ReadLine();
+
+            Console.WriteLine("Enter new ZIP code:");
+            selectedAddress.ZipCode = Console.ReadLine();
+
+            Console.WriteLine("Address updated successfully.");
+        }
+
+        static void AddNewAddress()
+        {
+            Address newAddress = new Address();
+
+            Console.WriteLine("Enter street:");
+            newAddress.Street = Console.ReadLine();
+
+            Console.WriteLine("Enter city:");
+            newAddress.City = Console.ReadLine();
+
+            Console.WriteLine("Enter state:");
+            newAddress.State = Console.ReadLine();
+
+            Console.WriteLine("Enter ZIP code:");
+            newAddress.ZipCode = Console.ReadLine();
+
+            addresses.Add(newAddress);
+
+            Console.WriteLine("New address added successfully.");
+        }
+
+        static void DisplayAddresses()
+        {
+            for (int i = 0; i < addresses.Count; i++)
+            {
+                Console.WriteLine($"[{i}] {addresses[i]}");
+            }
+        }
+    }
+    public partial class MainWindow : Window
+    {
+        public string SelectedAddress
+        {
+            get { return (string)GetValue(SelectedAddressProperty); }
+            set { SetValue(SelectedAddressProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedAddress.
+        public static readonly DependencyProperty SelectedAddressProperty =
+            DependencyProperty.Register("SelectedAddress", typeof(string), typeof(MainWindow), new PropertyMetadata(""));
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = this; // Set the DataContext to the current instance of MainWindow
+        }
+
+        private void AddressComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem selectedItem = (ComboBoxItem)addressComboBox.SelectedItem;
+            SelectedAddress = selectedItem.Content.ToString();
+        }
+    }
+
+
+}
+
